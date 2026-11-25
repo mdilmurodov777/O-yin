@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHADOW ARENA — 2 Player Battle</title>
+    <link rel="stylesheet" href="./responsive.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- Orqa fon zarrachalar va neon animatsiya canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- 1. KIRISH VA YUKLANISH EKRANI (INTRO SCREEN) -->
+    <section id="introScreen" class="screen active">
+        <div class="neon-grid"></div>
+        <div class="intro-content">
+            <div class="logo-wrapper">
+                <span class="sub-badge">CYBER COMBAT SYSTEM v2.6</span>
+                <h1 class="logo-3d" data-text="SHADOW ARENA">SHADOW ARENA</h1>
+                <p class="subtitle">2 PLAYER NEON BATTLE</p>
+            </div>
+
+            <div id="loadingBox" class="loading-box">
+                <div class="loading-bar-bg">
+                    <div id="loadingBar" class="loading-bar-fill"></div>
+                </div>
+                <p id="loadingText" class="loading-text">TIZIM YUKLANMOQDA... 0%</p>
+            </div>
+
+            <button id="startGameBtn" class="btn-cyber btn-primary hidden">
+                <span>START GAME</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 2. ASOSIY MENYU (MAIN MENU) -->
+    <section id="mainMenu" class="screen">
+        <div class="glass-panel menu-panel">
+            <h2 class="menu-title">SHADOW ARENA</h2>
+            <p class="menu-tagline">IKKI KISHILIK KIBER-JANG MAYDONI</p>
+
+            <div class="menu-buttons">
+                <button id="btnPlay" class="btn-cyber btn-primary">
+                    <span>PLAY (JANGNI BOSHLASH)</span>
+                </button>
+                <button id="btnHowToPlay" class="btn-cyber">
+                    <span>HOW TO PLAY (QOIDALAR)</span>
+                </button>
+                <button id="btnSettings" class="btn-cyber">
+                    <span>SETTINGS (SOZLAMALAR)</span>
+                </button>
+                <button id="btnAbout" class="btn-cyber">
+                    <span>ABOUT (O'YIN HAQIDA)</span>
+                </button>
+                <button id="btnSoundToggle" class="btn-cyber btn-accent">
+                    <span id="soundToggleText">SOUND: ON 🔊</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: HOW TO PLAY -->
+    <div id="modalHowTo" class="modal-overlay">
+        <div class="glass-panel modal-box">
+            <h3 class="modal-title">O'YIN QOIDALARI VA BOSHQARUV</h3>
+            <div class="controls-grid">
+                <div class="player-guide p1-guide">
+                    <h4>1-O'YINCHI (NEON CYAN)</h4>
+                    <ul>
+                        <li><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> — Harakatlanish</li>
+                        <li><kbd>F</kbd> — Oddiy zarba (Energiya yig'adi)</li>
+                        <li><kbd>G</kbd> yoki <kbd>F</kbd> (100% Energiya) — <strong>SUPER PORTLASH</strong></li>
+                    </ul>
+                </div>
+                <div class="player-guide p2-guide">
+                    <h4>2-O'YINCHI (CRIMSON RED)</h4>
+                    <ul>
+                        <li><kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> — Harakatlanish</li>
+                        <li><kbd>Enter</kbd> — Oddiy zarba (Energiya yig'adi)</li>
+                        <li><kbd>Shift</kbd> yoki <kbd>Enter</kbd> (100% Energiya) — <strong>SUPER PORTLASH</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="rule-note">
+                <strong>Maqsad:</strong> 3 raundlik jangda raqibning jonini (HP) 0 ga tushiring. 2 ta raundda g'olib bo'lgan o'yinchi chempion bo'ladi!
+            </p>
+            <button class="btn-cyber close-modal" data-target="modalHowTo"><span>YOPISH</span></button>
+        </div>
+    </div>
+
+    <!-- MODAL: SETTINGS -->
+    <div id="modalSettings" class="modal-overlay">
+        <div class="glass-panel modal-box">
+            <h3 class="modal-title">SOZLAMALAR</h3>
+            <div class="setting-item">
+                <label for="volumeSlider">Ovoz balandligi: <span id="volumeValue">70%</span></label>
+                <input type="range" id="volumeSlider" min="0" max="100" value="70">
+            </div>
+            <div class="setting-item">
+                <label for="speedSelect">O'yin tezligi:</label>
+                <select id="speedSelect" class="cyber-select">
+                    <option value="0.8">Sekin (0.8x)</option>
+                    <option value="1" selected>Normal (1.0x)</option>
+                    <option value="1.3">Tezkor / Turbo (1.3x)</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label for="shakeToggle">Ekran silkinishi (Screen Shake):</label>
+                <input type="checkbox" id="shakeToggle" checked class="cyber-checkbox">
+            </div>
+            <button class="btn-cyber close-modal" data-target="modalSettings"><span>SAQLASH VA YOPISH</span></button>
+        </div>
+    </div>
+
+    <!-- MODAL: ABOUT -->
+    <div id="modalAbout" class="modal-overlay">
+        <div class="glass-panel modal-box">
+            <h3 class="modal-title">SHADOW ARENA HAQIDA</h3>
+            <p class="about-text">
+                <strong>SHADOW ARENA — 2 Player Battle</strong> bu bitta qurilmada ikki do'st o'rtasidagi tezkor kiber-jang uchun yaratilgan futuristik arena o'yini. 
+                O'yin HTML5 Canvas 2.5D grafika, real vaqtdagi zarrachalar fizikasi va sintezlangan Web Audio ovoz tizimi asosida ishlaydi.
+            </p>
+            <p class="about-version">Versiya: 2.6.0 Pro | HTML5 / CSS3 / Vanilla JS</p>
+            <button class="btn-cyber close-modal" data-target="modalAbout"><span>ORQAGA</span></button>
+        </div>
+    </div>
+
+    <!-- 3. O'YIN MAYDONI (GAME SCREEN) -->
+    <section id="gameScreen" class="screen">
+        <!-- Yuqori HUD paneli -->
+        <header class="game-hud">
+            <!-- 1-O'yinchi holati -->
+            <div class="hud-player p1-hud">
+                <div class="hud-top-row">
+                    <span class="player-name">P1: CYBER SHADOW</span>
+                    <div class="round-dots" id="p1Dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+                <div class="bar-container hp-bg">
+                    <div id="p1HpBar" class="bar-fill p1-hp" style="width: 100%;"></div>
+                    <span id="p1HpText" class="bar-label">100 / 100</span>
+                </div>
+                <div class="bar-container energy-bg">
+                    <div id="p1EnergyBar" class="bar-fill energy-fill" style="width: 0%;"></div>
+                    <span id="p1EnergyText" class="bar-label-sm">ENERGY 0%</span>
+                </div>
+            </div>
+
+            <!-- Markaziy Hisob va Pauza -->
+            <div class="hud-center">
+                <div class="round-badge" id="roundBadge">ROUND 1 / 3</div>
+                <div class="score-board">
+                    <span id="p1Score">0</span> : <span id="p2Score">0</span>
+                </div>
+                <button id="btnPause" class="btn-pause" title="Pauza (ESC)">❚❚</button>
+            </div>
+
+            <!-- 2-O'yinchi holati -->
+            <div class="hud-player p2-hud">
+                <div class="hud-top-row">
+                    <div class="round-dots" id="p2Dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <span class="player-name">P2: CRIMSON PHANTOM</span>
+                </div>
+                <div class="bar-container hp-bg">
+                    <div id="p2HpBar" class="bar-fill p2-hp" style="width: 100%;"></div>
+                    <span id="p2HpText" class="bar-label">100 / 100</span>
+                </div>
+                <div class="bar-container energy-bg">
+                    <div id="p2EnergyBar" class="bar-fill energy-fill" style="width: 0%;"></div>
+                    <span id="p2EnergyText" class="bar-label-sm">ENERGY 0%</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Asosiy Jang Arenasi Canvas -->
+        <div class="arena-wrapper">
+            <canvas id="gameCanvas"></canvas>
+            <!-- Raund boshlanish / e'lon banneri -->
+            <div id="announceBanner" class="announce-banner hidden">ROUND 1</div>
+        </div>
+
+        <!-- Mobil / Planshet uchun Virtual Boshqaruv Tugmalari -->
+        <div id="touchControls" class="touch-controls">
+            <!-- P1 Virtual Pad -->
+            <div class="touch-pad p1-pad">
+                <div class="dpad">
+                    <button class="t-btn up" data-key="KeyW">▲</button>
+                    <button class="t-btn left" data-key="KeyA">◀</button>
+                    <button class="t-btn down" data-key="KeyS">▼</button>
+                    <button class="t-btn right" data-key="KeyD">▶</button>
+                </div>
+                <div class="action-btns">
+                    <button class="t-btn atk-btn p1-atk" data-key="KeyF">ATK</button>
+                    <button class="t-btn spc-btn" data-key="KeyG">ULT</button>
+                </div>
+            </div>
+
+            <!-- P2 Virtual Pad -->
+            <div class="touch-pad p2-pad">
+                <div class="action-btns">
+                    <button class="t-btn spc-btn" data-key="ShiftRight">ULT</button>
+                    <button class="t-btn atk-btn p2-atk" data-key="Enter">ATK</button>
+                </div>
+                <div class="dpad">
+                    <button class="t-btn up" data-key="ArrowUp">▲</button>
+                    <button class="t-btn left" data-key="ArrowLeft">◀</button>
+                    <button class="t-btn down" data-key="ArrowDown">▼</button>
+                    <button class="t-btn right" data-key="ArrowRight">▶</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. PAUSE OVERLAY -->
+    <div id="pauseOverlay" class="modal-overlay">
+        <div class="glass-panel modal-box">
+            <h2 class="modal-title">O'YIN TO'XTATILDI (PAUSED)</h2>
+            <div class="menu-buttons">
+                <button id="btnResume" class="btn-cyber btn-primary"><span>RESUME (DAVOM ETISH)</span></button>
+                <button id="btnRestartMatch" class="btn-cyber"><span>RESTART (QAYTA BOSHLASH)</span></button>
+                <button id="btnPauseMainMenu" class="btn-cyber btn-danger"><span>MAIN MENU (ASOSIY MENYU)</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. GAME OVER OVERLAY -->
+    <div id="gameOverOverlay" class="modal-overlay">
+        <div class="glass-panel modal-box gameover-box">
+            <span class="winner-badge">CHAMPION OF THE ARENA</span>
+            <h2 id="winnerTitle" class="winner-title">1-O'YINCHI G'OLIB!</h2>
+            <p id="finalScoreText" class="final-score">YAKUNIY HISOB: 2 - 1</p>
+            <div class="menu-buttons">
+                <button id="btnRematch" class="btn-cyber btn-primary"><span>REMATCH (QAYTA JANG)</span></button>
+                <button id="btnOverMainMenu" class="btn-cyber"><span>MAIN MENU (ASOSIY MENYU)</span></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
